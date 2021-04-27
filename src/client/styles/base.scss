@@ -1,9 +1,21 @@
 body {
     background-color: #67d6e0;
     font-size: 1em;
+    margin: 0;
+    position: relative;
 }
 
 .page-heading {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 3rem;
+    text-align: center;
+}
+
+.input-container {
+    position: absolute;
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%,-50%);
+    width: 60vw;
+    max-width: 350px;
 }

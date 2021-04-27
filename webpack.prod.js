@@ -10,6 +10,19 @@ module.exports = {
             {
                 test: /\.scss$/,
                 use: [ MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader' ]
+            },
+            {
+                test: /\.png$/,
+                //https://knowledge.udacity.com/questions/539026#539551
+                use: [
+                    {
+                        loader: "file-loader",
+                        options: {
+                            name: "[name].[ext]",
+                            outputPath: "assets/icons"
+                        } 
+                    }
+                ]
             }
         ]
     },

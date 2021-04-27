@@ -1,0 +1,10 @@
+#result-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: baseline;
+
+    img {
+        width: 100%;
+        border-radius: 5px;
+    }
+}

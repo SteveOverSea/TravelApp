@@ -13,10 +13,13 @@ async function apiRequestHandler (event) {
 
     const zipCode = document.getElementById("zip").value;
     const countryCode = document.getElementById("country").value;
-    let date = document.getElementById("date").value;
+    const dateInput = document.getElementById("date");
+    dateInput.classList.remove("error");
+    let date = dateInput.value;
+    const dateError = document.getElementById("error-date");
+    dateError.textContent = "";
 
-    const placesDiv = document.getElementById("possible-places");
-    placesDiv.innerHTML = "";
+    const inputContainer = document.getElementsByClassName("input-container")[0];
 
     try {
         if(!validateDate(date))
@@ -32,6 +35,11 @@ async function apiRequestHandler (event) {
 
         const responseData = await response.json();
 
+        const selectDiv = document.createElement("div");
+        selectDiv.id = "select-div";
+        const selectHeading = document.createElement("h2");
+        selectHeading.textContent = "select the correct city";
+        const selectForm = document.createElement("form");
         const select = document.createElement("select");
         select.id = "city-select";
         const selectButton = document.createElement("button");
@@ -46,11 +54,22 @@ async function apiRequestHandler (event) {
 
         initSendGeoData(selectButton, select, date);
 
-        placesDiv.appendChild(select);
-        placesDiv.appendChild(selectButton);
+        selectDiv.appendChild(selectHeading);
+        selectForm.appendChild(select);
+        selectForm.appendChild(selectButton);
+        selectDiv.appendChild(selectForm);
+        
+        document.getElementById("submit-form").remove();
+
+        inputContainer.appendChild(selectDiv);
 
     } catch (error) {
-        console.log(error);
+        if(error.message == "invalid date") {
+            dateError.textContent = "not a valid date";
+            dateInput.classList.add("error");
+        }
+        else
+            console.log(error);
     }
 }
 
@@ -64,7 +83,9 @@ function initSendGeoData (button, select, date) {
     let responseData;
 
     // write function instead!
-    button.addEventListener("click", async () => {
+    button.addEventListener("click", async (e) => {
+        e.preventDefault();
+
         const select = document.getElementById("city-select");
         const city = select.selectedOptions[0].textContent.split(",")[0];
         console.log(select.selectedOptions[0].textContent);
@@ -88,20 +109,24 @@ function initSendGeoData (button, select, date) {
 }
 
 function updateDOM (data, withinAWeek, city) {
+    document.getElementById("select-div").remove();
     const img = document.createElement("img");
     img.src = data.imgURL;
 
     const div = document.createElement("div");
-    div.id = "result";
+    div.id = "result-div";
     div.appendChild(img);
 
     if(withinAWeek) {
         const h2 = document.createElement("h2");
         h2.textContent = "Current weather in " + city;
+        const icon = document.createElement("img");
+        icon.src = "./assets/icons/" + data.weather.icon + ".png";
         const p = document.createElement("p");
         p.innerHTML = `Temp: ${data.temp}°C, Weather: ${data.weather.description}`;
         div.appendChild(h2);
         div.appendChild(p);
+        div.appendChild(icon);
     } else {
         const h2 = document.createElement("h2");
         h2.textContent = "Weather forecast for " + city;
@@ -109,11 +134,14 @@ function updateDOM (data, withinAWeek, city) {
         data.weatherData.forEach(el => {
             const p = document.createElement("p");
             p.innerHTML = `Date: ${el.date}, Temp: ${el.temp}°C, Weather: ${el.weather.description}`;
+            const icon = document.createElement("img");
+            icon.src = "./assets/icons/" + el.weather.icon + ".png";
             div.appendChild(p);
+            div.appendChild(icon);
         });
     }
 
-    document.body.appendChild(div);
+    document.getElementsByClassName("input-container")[0].appendChild(div);
 }
 
 function resetDOM () {
