@@ -88,7 +88,6 @@ function initSendGeoData (button, select, date) {
 
         const select = document.getElementById("city-select");
         const city = select.selectedOptions[0].textContent.split(",")[0];
-        console.log(select.selectedOptions[0].textContent);
 
         try {
             const response = await fetch ("/geodata", {
@@ -119,29 +118,57 @@ function updateDOM (data, withinAWeek, city) {
 
     if(withinAWeek) {
         const h2 = document.createElement("h2");
+        h2.classList.add("weather-heading");
         h2.textContent = "Current weather in " + city;
-        const icon = document.createElement("img");
-        icon.src = "./assets/icons/" + data.weather.icon + ".png";
-        const p = document.createElement("p");
-        p.innerHTML = `Temp: ${data.temp}°C, Weather: ${data.weather.description}`;
         div.appendChild(h2);
-        div.appendChild(p);
-        div.appendChild(icon);
+
+        createWeatherResult(data.temp, data.weather.description, data.weather.icon, div, null);
+        
     } else {
         const h2 = document.createElement("h2");
+        h2.classList.add("weather-heading");
         h2.textContent = "Weather forecast for " + city;
         div.appendChild(h2);
+
+        const weatherResultDiv = document.createElement("div");
+        weatherResultDiv.classList.add("forecast");
+
         data.weatherData.forEach(el => {
-            const p = document.createElement("p");
-            p.innerHTML = `Date: ${el.date}, Temp: ${el.temp}°C, Weather: ${el.weather.description}`;
-            const icon = document.createElement("img");
-            icon.src = "./assets/icons/" + el.weather.icon + ".png";
-            div.appendChild(p);
-            div.appendChild(icon);
+            createWeatherResult(el.temp, el.weather.description, el.weather.icon, weatherResultDiv, el.date);
         });
+
+        div.appendChild(weatherResultDiv);
     }
 
-    document.getElementsByClassName("input-container")[0].appendChild(div);
+    document.body.appendChild(div);
+}
+
+function createWeatherResult(temp, weather, imgSrc, container, date) {
+    const entryDiv = document.createElement("div");
+    entryDiv.classList.add("weather-entry");
+    
+    if(date) {
+        const dateParts = date.split("-");
+        const h3 = document.createElement("h3");
+        h3.textContent = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]).toLocaleDateString("de-DE");
+        h3.classList.add("weather-date-heading");
+        entryDiv.appendChild(h3);
+    }
+
+    const icon = document.createElement("img");
+    icon.classList.add("weather-icon");
+    icon.src = "./assets/icons/" + imgSrc + ".png";
+
+    const weatherP = document.createElement("p");
+    weatherP.innerHTML = weather;
+
+    const tempP = document.createElement("p");
+    tempP.innerHTML = temp + " °C";
+    
+    entryDiv.appendChild(icon);
+    entryDiv.appendChild(weatherP);
+    entryDiv.appendChild(tempP);
+    container.appendChild(entryDiv);
 }
 
 function resetDOM () {
