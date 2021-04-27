@@ -38,22 +38,69 @@ async function getGeonamesData (zipCode, countryCode) {
 }
 
 app.post("/geodata", async (req, res) => {
-    // trip within one week: show current weather
-    // trip in more than one week show forecast
-    console.log(req.body);
-    const response = await getWeatherbitData(req.body.lat, req.body.lng);
-    //console.log(response);
+    let response;
+    if(req.body.withinAWeek) {
+        response = await getCurrentWeather(req.body.lat, req.body.lng);
+    } else {
+        response = { weatherData: await getWeatherForecast(req.body.lat, req.body.lng) };
+    }
+
+    const imgUrl = await getPicture(req.body.city);
+    response["imgURL"] = imgUrl;
+
+    res.send(response);
 });
 
-async function getWeatherbitData (lat, lng) {
+async function getPicture(cityName) {
+
+    cityName = changeVowels(cityName);
     try {
-        const url = `https://api.weatherbit.io/v2.0/forecast/daily?&lat=${lat}&lon=${lng}&key=${process.env.WEATHERBIT_API_KEY}`;
+        const url = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=${cityName}&order=popular`
         const response = await fetch(url);
-        return await response.json();
+        const responseData = await response.json();
+        return responseData.hits[0].webformatURL;
     } catch (error) {
         console.log(error);
         return {};
     }
+}
 
+function changeVowels(string) {
+    string = string.replace("ä", "ae");
+    string = string.replace("ö", "oe");
+    string = string.replace("ü", "ue");
+    return string;
+}
 
+async function getWeatherForecast(lat, lng) {
+    try {
+        const url = `https://api.weatherbit.io/v2.0/forecast/daily?&lat=${lat}&lon=${lng}&key=${process.env.WEATHERBIT_API_KEY}`;
+        const response = await fetch(url);
+        const responseData = await response.json();
+        return responseData.data.map(obj => {
+            return {
+               date: obj.valid_date,
+               temp: obj.temp,
+               weather: obj.weather
+            };
+        });
+    } catch (error) {
+        console.log(error);
+        return {};
+    }
+}
+
+async function getCurrentWeather(lat, lng) {
+    try {
+        const url = `https://api.weatherbit.io/v2.0/current?&lat=${lat}&lon=${lng}&units=M&lang=en&key=${process.env.WEATHERBIT_API_KEY}`;
+        const response = await fetch(url);
+        const responseData = await response.json();
+        return {
+            temp: responseData.data[0].temp,
+            weather: responseData.data[0].weather
+        }
+    } catch (error) {
+        console.log(error);
+        return {};
+    }
 }

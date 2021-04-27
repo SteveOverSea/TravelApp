@@ -7,7 +7,6 @@ export function setMinMaxDates () {
 
     dateInput.min = formatHTMLDate(today);
     dateInput.max = formatHTMLDate(lastDay);
-    // still need JS validation for Safari!
 }
 
 function formatHTMLDate(date) {
@@ -35,7 +34,6 @@ function isDateWithinDuration (date, days) {
 
     const todayDate = new Date();
     const inputDate = new Date(year, month - 1, day);
-
 
     for (let i = 0; i<=days; i++) {
         if(todayDate.getFullYear() == inputDate.getFullYear()
