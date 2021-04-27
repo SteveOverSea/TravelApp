@@ -1,7 +1,9 @@
-import { zip } from "lodash";
+import { setMinMaxDates, validateDate, isWithinAWeek } from "./formChecker.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("submit").addEventListener("click", apiRequestHandler);
+    document.getElementById("submit-form").addEventListener("submit", apiRequestHandler);
+
+    setMinMaxDates();
 });
 
 async function apiRequestHandler (event) {
@@ -9,12 +11,16 @@ async function apiRequestHandler (event) {
 
     const zipCode = document.getElementById("zip").value;
     const countryCode = document.getElementById("country").value;
+    let date = document.getElementById("date").value;
 
     const placesDiv = document.getElementById("possible-places");
     placesDiv.innerHTML = "";
 
     try {
-       const response = await fetch("/submit", {
+        if(!validateDate(date))
+            throw new Error("invalid date");
+
+        const response = await fetch("/submit", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
@@ -35,7 +41,7 @@ async function apiRequestHandler (event) {
             select.appendChild(option);
         });
 
-        initSendGeoData(selectButton, select);
+        initSendGeoData(selectButton, select, date);
 
         placesDiv.appendChild(select);
         placesDiv.appendChild(selectButton);
@@ -45,10 +51,13 @@ async function apiRequestHandler (event) {
     }
 }
 
-function initSendGeoData (button, select) {
+function initSendGeoData (button, select, date) {
     const value = select.value;
     const lat = value.split(",")[0];
     const lng = value.split(",")[1];
+
+    const withinAWeek = isWithinAWeek(date);
+    console.log(withinAWeek);
 
     button.addEventListener("click", async () => {
         
@@ -57,7 +66,7 @@ function initSendGeoData (button, select) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ lat, lng })
+            body: JSON.stringify({ lat, lng, date, withinAWeek })
         });
     })
 }

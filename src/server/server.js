@@ -38,9 +38,11 @@ async function getGeonamesData (zipCode, countryCode) {
 }
 
 app.post("/geodata", async (req, res) => {
+    // trip within one week: show current weather
+    // trip in more than one week show forecast
     console.log(req.body);
     const response = await getWeatherbitData(req.body.lat, req.body.lng);
-    console.log(response);
+    //console.log(response);
 });
 
 async function getWeatherbitData (lat, lng) {

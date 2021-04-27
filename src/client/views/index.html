@@ -8,13 +8,13 @@
 </head>
 <body>
     <h1>TravelApp</h1>
-    <form>
-        <input id="zip" type="text" placeholder="zip code" value="4020">
-        <select id="country">
+    <form id="submit-form">
+        <input id="zip" type="text" placeholder="zip code" value="4020" required>
+        <select id="country" required>
             <option value="AT">austria</option>
             <option value="DE">germany</option>
         </select>
-        <input type="date" placeholder="yyyy-mm-dd">
+        <input type="date" id="date" placeholder="yyyy-mm-dd" pattern="\d{4}-\d{2}-\d{2}" required>
         <button id="submit">submit</button>
     </form>
     <div id="possible-places"></div>
