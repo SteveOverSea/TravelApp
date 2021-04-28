@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const fetch = require("node-fetch");
 const countries = require("i18n-iso-countries");
+const { response } = require("express");
 
 const PORT = 8080;
 
@@ -16,27 +17,34 @@ app.listen(PORT, () => console.log("listening on port " + PORT));
 
 let receivedData;
 
+app.post("/cities", async (req, res) => {
+    const input = changeVowels(req.body.input);
+    try {
+        const url = `http://api.geonames.org/search?name=${input}&maxRows=5&type=json&username=${process.env.GEONMAMES_USERNAME}`;
+        const response = await fetch(url);
+        
+        const responseData = await response.json();
+        res.send(responseData);
+    } catch (error) {
+        console.log(error);
+    }
+
+    
+});
+
 app.post("/submit", async (req, res) => {
     receivedData = {}; // reset
 
     receivedData["city"] = req.body.city;
     receivedData["countryCode"] = req.body.countryCode;
     receivedData["withinAWeek"] = req.body.withinAWeek;
+    receivedData["lat"] = req.body.lat;
+    receivedData["lng"] = req.body.lng;
 
-    geonamesResponse = await getGeonamesData(req.body.city, req.body.countryCode);
-
-    if (geonamesResponse.geonames) {
-         receivedData["lat"] = geonamesResponse.geonames[0].lat;
-         receivedData["lng"] = geonamesResponse.geonames[0].lng;
-         receivedData["city"] = geonamesResponse.geonames[0].name;
-
-        const weatherData = await getWeather();
-        const imgURL = await getPicture(receivedData.city);
-        const city = receivedData.city;
-        const withinAWeek = receivedData.withinAWeek;
+    receivedData["weatherData"] = await getWeather();
+    receivedData["imgURL"] = await getPicture(receivedData.city);
         
-        res.send({weatherData, imgURL, city, withinAWeek});
-    }
+    res.send(receivedData);
 });
 
 function getWeather() {
@@ -49,23 +57,9 @@ function getWeather() {
     return weather;
 }
 
-async function getGeonamesData (city, countryCode) {
-    city = changeVowels(city);
-    try {
-        const url = `http://api.geonames.org/search?name=${city}&country=${countryCode}&type=json&username=${process.env.GEONMAMES_USERNAME}`;
-        const response = await fetch(url);
-        
-        return await response.json();
-    
-    } catch (error) {
-        console.log(error);
-        return {};
-    }
-}
+async function getPicture() {
 
-async function getPicture(cityName) {
-
-    cityName = changeVowels(cityName);
+    const cityName = changeVowels(receivedData.city);
 
     try {
         // city picture
@@ -78,7 +72,7 @@ async function getPicture(cityName) {
         else {
             // country picture
             const countryName = countries.getName(receivedData.countryCode, "en", {select: "official"});
-            url = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=${countryName}&order=popular`;
+            url = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=${countryName}&order=popular&lang=en&category=places`;
             let response = await fetch(url);
             let responseData = await response.json();
 

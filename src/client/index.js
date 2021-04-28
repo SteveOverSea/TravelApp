@@ -6,6 +6,7 @@ import "./styles/result.scss"
 import "./js/app.js"
 import "./js/formChecker.js"
 import "./js/apiRequestHandler.js"
+import "./js/locationSuggester.js"
 
 import  "./media/weather/a01d.png"
 import  "./media/weather/a01n.png"

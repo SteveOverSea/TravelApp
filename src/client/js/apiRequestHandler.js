@@ -8,24 +8,45 @@ export async function submitInputForm (event) {
     resetDOM();
 
     // collect inputs
-    const city = document.getElementById("city").value;
-    const countryCode = document.getElementById("country").value;
+    const location = document.getElementById("location");
+    const city = location.value.split(",")[0];
+    const countryCode = location.value.split(",")[1];
+    const lat = location.dataset.lat;
+    const lng = location.dataset.lng;
 
     const dateInput = document.getElementById("date");
     dateInput.classList.remove("error");
 
     const date = dateInput.value;
 
-    await checkDateAndSendGeoData(date, city, countryCode);  
-}
+    const withinAWeek = isWithinAWeek(date);
 
-async function checkDateAndSendGeoData(date, city, countryCode) {
+    const sendData = {
+        city,
+        countryCode,
+        lat,
+        lng,
+        withinAWeek
+    };
+
     try {
-        if(!validateDate(date))
+        if(!validateDate(date)) 
             throw new Error("invalid date");
         
-        const withinAWeek = isWithinAWeek(date);
+        await checkDateAndSendGeoData(sendData); 
+    } catch (error) {
+        if (error.message == "invalid date") {
+            document.getElementById("error-date").textContent = "not a valid date";
+            document.getElementById("date").classList.add("error");
+        } else 
+            console.log(error);
+    }
 
+     
+}
+
+async function checkDateAndSendGeoData(data) {
+    try {
         // send city and country code to server -> geonames API
         // and get weather results
        const response =  await fetch("/submit", {
@@ -33,7 +54,7 @@ async function checkDateAndSendGeoData(date, city, countryCode) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ city, countryCode, withinAWeek})
+            body: JSON.stringify(data)
         });
 
         const responseData = await response.json();
@@ -41,12 +62,7 @@ async function checkDateAndSendGeoData(date, city, countryCode) {
         showResult(responseData);
 
     } catch (error) {
-        if(error.message == "invalid date") {
-            document.getElementById("error-date").textContent = "not a valid date";
-            document.getElementById("date").classList.add("error");
-        }
-        else
-            console.log(error);
+        console.log(error);
     }
 }
 
@@ -70,7 +86,7 @@ function showResult(data) {
     } else {
         const h2 = document.createElement("h2");
         h2.classList.add("weather-heading");
-        h2.textContent = "Weather forecast for " + data.city;
+        h2.textContent = "Weather forecast for " + data.city + ", " + data.countryCode;
         div.appendChild(h2);
 
         const weatherResultDiv = document.createElement("div");
@@ -120,4 +136,8 @@ function resetDOM () {
     }
 
     document.getElementById("error-date").textContent = "";
+}
+
+function cityInputHandler (e) {
+    console.log(e.target.value);
 }
