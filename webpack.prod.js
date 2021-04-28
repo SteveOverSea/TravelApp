@@ -8,12 +8,17 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: "babel-loader"
+            },
+            {
                 test: /\.scss$/,
                 use: [ MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader' ]
             },
             {
                 test: /\.png$/,
-                //https://knowledge.udacity.com/questions/539026#539551
+                // the file loader config is from https://knowledge.udacity.com/questions/539026#539551 
                 use: [
                     {
                         loader: "file-loader",

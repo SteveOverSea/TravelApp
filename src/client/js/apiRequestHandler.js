@@ -1,6 +1,7 @@
 import { validateDate, isWithinAWeek } from "./formChecker.js"
 
-// on click event handler for submit-button
+// handles the form-submit
+
 export async function submitInputForm (event) {
     event.preventDefault();
 
@@ -21,7 +22,9 @@ export async function submitInputForm (event) {
 
     const withinAWeek = isWithinAWeek(date);
 
-    const sendData = {
+    // prepare primary object to send data to server
+
+    const dataObject = {
         city,
         countryCode,
         lat,
@@ -33,22 +36,19 @@ export async function submitInputForm (event) {
         if(!validateDate(date)) 
             throw new Error("invalid date");
         
-        await checkDateAndSendGeoData(sendData); 
+        await sendData(dataObject); 
     } catch (error) {
         if (error.message == "invalid date") {
             document.getElementById("error-date").textContent = "not a valid date";
             document.getElementById("date").classList.add("error");
         } else 
             console.log(error);
-    }
-
-     
+    } 
 }
 
-async function checkDateAndSendGeoData(data) {
+// send data to server, response is an object with all necessary information (weather, imgURL, ...)
+async function sendData(data) {
     try {
-        // send city and country code to server -> geonames API
-        // and get weather results
        const response =  await fetch("/submit", {
             method: "POST",
             headers: {
@@ -66,7 +66,7 @@ async function checkDateAndSendGeoData(data) {
     }
 }
 
-// create Results
+// create results
 function showResult(data) {
     document.getElementById("submit-form").classList.add("hidden");
 
@@ -80,6 +80,7 @@ function showResult(data) {
     const weatherCard = document.createElement("div");
     weatherCard.id = "weather-card";
 
+    // different representation if only current weather or forecast (=array)
     if (data.withinAWeek) {
         const h2 = document.createElement("h2");
         h2.classList.add("weather-heading");
@@ -106,8 +107,7 @@ function showResult(data) {
     resultDiv.appendChild(weatherCard);
     document.body.appendChild(resultDiv);
 
-    // new form button
-
+    // reset button
     const resetButton = document.createElement("button");
     resetButton.id = "reset-button";
     resetButton.textContent = "new trip";
@@ -121,6 +121,16 @@ function resetForm() {
     document.getElementById("reset-button").remove();
 }
 
+function resetDOM () {
+    const div = document.getElementById("result-div");
+    if(div) {
+        div.remove();
+    }
+
+    document.getElementById("error-date").textContent = "";
+}
+
+// create a weather entry with date (if there), temp, icon and description
 function createWeatherResult(temp, weather, imgSrc, container, date) {
     const entryDiv = document.createElement("div");
     entryDiv.classList.add("weather-entry");
@@ -147,13 +157,4 @@ function createWeatherResult(temp, weather, imgSrc, container, date) {
     entryDiv.appendChild(weatherP);
     entryDiv.appendChild(tempP);
     container.appendChild(entryDiv);
-}
-
-function resetDOM () {
-    const div = document.getElementById("result-div");
-    if(div) {
-        div.remove();
-    }
-
-    document.getElementById("error-date").textContent = "";
 }

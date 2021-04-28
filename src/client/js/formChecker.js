@@ -1,3 +1,6 @@
+// all the formchecker functions for input-validation
+
+// sets min max dates on the date-input
 export function setMinMaxDates () {
     const dateInput = document.getElementById("date");
 
@@ -9,6 +12,7 @@ export function setMinMaxDates () {
     dateInput.max = formatHTMLDate(lastDay);
 }
 
+// format to yyyy-mm-dd format
 function formatHTMLDate(date) {
     const year = date.getFullYear();
     const month = make2Digit(date.getMonth() + 1);
@@ -17,6 +21,7 @@ function formatHTMLDate(date) {
     return year + "-" + month + "-" + day;
 }
 
+// helper: create leading zeroes to make 1-digit to 2-digit number
 function make2Digit (number) {
     if (number < 10)
         return "0" + number;
@@ -27,6 +32,11 @@ export function validateDate (date) {
     return isDateWithinDuration(date, 16);
 }
 
+export function isWithinAWeek (date) {
+    return isDateWithinDuration(date, 7);
+}
+
+// returns if a given date is in the timespan between now and now+days
 function isDateWithinDuration (date, days) {
     const year = date.split("-")[0];
     const month = date.split("-")[1];
@@ -44,8 +54,4 @@ function isDateWithinDuration (date, days) {
         todayDate.setDate(todayDate.getDate() + 1);
     }
     return false;
-}
-
-export function isWithinAWeek (date) {
-    return isDateWithinDuration(date, 7);
 }
