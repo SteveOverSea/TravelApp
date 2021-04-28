@@ -12,8 +12,8 @@ export function setMinMaxDates () {
     dateInput.max = formatHTMLDate(lastDay);
 }
 
-// format to yyyy-mm-dd format
-function formatHTMLDate(date) {
+// format Date obj to yyyy-mm-dd format
+export function formatHTMLDate(date) {
     const year = date.getFullYear();
     const month = make2Digit(date.getMonth() + 1);
     const day = make2Digit(date.getDate());
@@ -37,7 +37,7 @@ export function isWithinAWeek (date) {
 }
 
 // returns if a given date is in the timespan between now and now+days
-function isDateWithinDuration (date, days) {
+export function isDateWithinDuration (date, days) {
     const year = date.split("-")[0];
     const month = date.split("-")[1];
     const day = date.split("-")[2];
