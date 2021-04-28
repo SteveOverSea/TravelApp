@@ -2,8 +2,11 @@ import "./styles/base.scss"
 import "./styles/form.scss"
 import "./styles/select.scss"
 import "./styles/result.scss"
+
 import "./js/app.js"
 import "./js/formChecker.js"
+import "./js/apiRequestHandler.js"
+
 import  "./media/weather/a01d.png"
 import  "./media/weather/a01n.png"
 import  "./media/weather/a02d.png"

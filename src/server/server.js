@@ -4,6 +4,7 @@ const app = express();
 const dotenv = require("dotenv");
 dotenv.config();
 const fetch = require("node-fetch");
+const countries = require("i18n-iso-countries");
 
 const PORT = 8080;
 
@@ -13,20 +14,45 @@ app.use(express.json());
 
 app.listen(PORT, () => console.log("listening on port " + PORT));
 
+let receivedData;
+
 app.post("/submit", async (req, res) => {
+    receivedData = {}; // reset
 
-    geonamesResponse = await getGeonamesData(req.body.zipCode, req.body.countryCode);
+    receivedData["city"] = req.body.city;
+    receivedData["countryCode"] = req.body.countryCode;
+    receivedData["withinAWeek"] = req.body.withinAWeek;
 
-    if (geonamesResponse.postalCodes) {
-        res.send(geonamesResponse.postalCodes);
-    }
+    geonamesResponse = await getGeonamesData(req.body.city, req.body.countryCode);
+
+    if (geonamesResponse.geonames) {
+         receivedData["lat"] = geonamesResponse.geonames[0].lat;
+         receivedData["lng"] = geonamesResponse.geonames[0].lng;
+         receivedData["city"] = geonamesResponse.geonames[0].name;
+
+        const weatherData = await getWeather();
+        const imgURL = await getPicture(receivedData.city);
+        const city = receivedData.city;
+        const withinAWeek = receivedData.withinAWeek;
         
-
+        res.send({weatherData, imgURL, city, withinAWeek});
+    }
 });
 
-async function getGeonamesData (zipCode, countryCode) {
+function getWeather() {
+    let weather;
+    if (receivedData.withinAWeek) {
+        weather = getCurrentWeather(receivedData.lat, receivedData.lng);
+    } else {
+        weather = getWeatherForecast(receivedData.lat, receivedData.lng);
+    }
+    return weather;
+}
+
+async function getGeonamesData (city, countryCode) {
+    city = changeVowels(city);
     try {
-        const url = `http://api.geonames.org/postalCodeSearchJSON?postalcode=${zipCode}&country=${countryCode}&username=${process.env.GEONMAMES_USERNAME}`;
+        const url = `http://api.geonames.org/search?name=${city}&country=${countryCode}&type=json&username=${process.env.GEONMAMES_USERNAME}`;
         const response = await fetch(url);
         
         return await response.json();
@@ -37,28 +63,35 @@ async function getGeonamesData (zipCode, countryCode) {
     }
 }
 
-app.post("/geodata", async (req, res) => {
-    let response;
-    if(req.body.withinAWeek) {
-        response = await getCurrentWeather(req.body.lat, req.body.lng);
-    } else {
-        response = { weatherData: await getWeatherForecast(req.body.lat, req.body.lng) };
-    }
-
-    const imgUrl = await getPicture(req.body.city);
-    response["imgURL"] = imgUrl;
-
-    res.send(response);
-});
-
 async function getPicture(cityName) {
 
     cityName = changeVowels(cityName);
+
     try {
-        const url = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=${cityName}&order=popular`
-        const response = await fetch(url);
-        const responseData = await response.json();
-        return responseData.hits[0].webformatURL;
+        // city picture
+        let url = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=${cityName}&order=popular`
+        let response = await fetch(url);
+        let responseData = await response.json();
+
+        if(responseData.hits.length > 0)
+            return responseData.hits[0].webformatURL;
+        else {
+            // country picture
+            const countryName = countries.getName(receivedData.countryCode, "en", {select: "official"});
+            url = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=${countryName}&order=popular`;
+            let response = await fetch(url);
+            let responseData = await response.json();
+
+            if(responseData.hits.length > 0)
+                return responseData.hits[0].webformatURL;
+            else {
+                // travel picture
+                url = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=travel&order=popular`;
+                let response = await fetch(url);
+                let responseData = await response.json();
+                return responseData.hits[0].webformatURL;
+            }
+        }
     } catch (error) {
         console.log(error);
         return {};
