@@ -1,27 +1,36 @@
 #result-div {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    width: 60vw;
-    max-width: 400px;
-    max-height: max-content;
-    min-height: min-content;
+    justify-content: start;
     margin: 0 auto;
+    max-height: 75%;
+    max-width: 80%;
     font-family: Arial, Helvetica, sans-serif;
     background-color: #FFF;
     border-radius: 50px;
     box-shadow: 1px 1px 15px 3px #777;
+    margin: 2rem auto;
+
+    #weather-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+        height: 100%;
+    }
 
     img {
         width: 100%;
+        max-height: 50%;
         border-top-right-radius: 50px;
         border-top-left-radius: 50px;
-        object-fit: contain;
+        object-fit: cover;
         margin: 0 auto;
 
         &.weather-icon {
             display: block;
-            width: 2rem;
+            width: fit-content;
             object-fit: contain;
             margin: 0 auto;
         }
@@ -29,8 +38,8 @@
 
     .weather-heading {
         text-align: center;
-        font-size: 0.95rem;
-        margin: 0.3rem auto;
+        font-size: 1.25rem;
+        margin: 0.5rem auto 0 auto;
     }
 
     .weather-date-heading {
@@ -41,7 +50,7 @@
     p {
         text-align: center;
         margin: 0.25rem auto;
-        font-size: 0.75rem;
+        font-size: 1rem;
         width: max-content;
     }
 
@@ -55,6 +64,7 @@
         flex-direction: row;
         overflow-x: scroll;
         margin: 0.5rem 0;
+        max-width: 100%;
     }
 
     .forecast::-webkit-scrollbar {

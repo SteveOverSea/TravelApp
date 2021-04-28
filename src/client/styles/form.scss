@@ -2,9 +2,11 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
 
     input, select, button {
         height: 1.5rem;
+        width: 80%;
         border: 1px solid #000;
         border-radius: 1.5rem;
         padding: 0.25rem;
@@ -13,7 +15,9 @@
     }
 
     #submit {
-        width: 40%;
+        width: 30%;
+        height: 2rem;
+        font-size: 1.1rem;
         align-self: center;
         background-color: #DB8816;
         cursor: pointer;
@@ -41,5 +45,9 @@
     .error {
         background-color: #F2244E;
         opacity: 0.8;
+    }
+
+    &.hidden {
+        display: none;
     }
 }

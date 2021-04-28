@@ -68,26 +68,31 @@ async function checkDateAndSendGeoData(data) {
 
 // create Results
 function showResult(data) {
+    document.getElementById("submit-form").classList.add("hidden");
+
     const img = document.createElement("img");
     img.src = data.imgURL;
 
-    const div = document.createElement("div");
-    div.id = "result-div";
-    div.appendChild(img);
+    const resultDiv = document.createElement("div");
+    resultDiv.id = "result-div";
+    resultDiv.appendChild(img);
+
+    const weatherCard = document.createElement("div");
+    weatherCard.id = "weather-card";
 
     if (data.withinAWeek) {
         const h2 = document.createElement("h2");
         h2.classList.add("weather-heading");
         h2.textContent = "Current weather in " + data.city;
-        div.appendChild(h2);
+        weatherCard.appendChild(h2);
 
-        createWeatherResult(data.weatherData.temp, data.weatherData.weather.description, data.weatherData.weather.icon, div, null);
+        createWeatherResult(data.weatherData.temp, data.weatherData.weather.description, data.weatherData.weather.icon, weatherCard, null);
         
     } else {
         const h2 = document.createElement("h2");
         h2.classList.add("weather-heading");
         h2.textContent = "Weather forecast for " + data.city + ", " + data.countryCode;
-        div.appendChild(h2);
+        weatherCard.appendChild(h2);
 
         const weatherResultDiv = document.createElement("div");
         weatherResultDiv.classList.add("forecast");
@@ -95,10 +100,25 @@ function showResult(data) {
             createWeatherResult(el.temp, el.weather.description, el.weather.icon, weatherResultDiv, el.date);
         });
 
-        div.appendChild(weatherResultDiv);
+        weatherCard.appendChild(weatherResultDiv);
     }
 
-    document.body.appendChild(div);
+    resultDiv.appendChild(weatherCard);
+    document.body.appendChild(resultDiv);
+
+    // new form button
+
+    const resetButton = document.createElement("button");
+    resetButton.id = "reset-button";
+    resetButton.textContent = "new trip";
+    resetButton.addEventListener("click", resetForm);
+    document.body.appendChild(resetButton);
+}
+
+function resetForm() {
+    resetDOM();
+    document.getElementById("submit-form").classList.remove("hidden");
+    document.getElementById("reset-button").remove();
 }
 
 function createWeatherResult(temp, weather, imgSrc, container, date) {
@@ -136,8 +156,4 @@ function resetDOM () {
     }
 
     document.getElementById("error-date").textContent = "";
-}
-
-function cityInputHandler (e) {
-    console.log(e.target.value);
 }

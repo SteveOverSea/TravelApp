@@ -1,6 +1,5 @@
 import "./styles/base.scss"
 import "./styles/form.scss"
-import "./styles/select.scss"
 import "./styles/result.scss"
 
 import "./js/app.js"

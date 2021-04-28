@@ -20,7 +20,7 @@ let receivedData;
 app.post("/cities", async (req, res) => {
     const input = changeVowels(req.body.input);
     try {
-        const url = `http://api.geonames.org/search?name=${input}&maxRows=5&type=json&username=${process.env.GEONMAMES_USERNAME}`;
+        const url = `http://api.geonames.org/search?name=${input}&maxRows=5&lang=en&type=json&username=${process.env.GEONMAMES_USERNAME}`;
         const response = await fetch(url);
         
         const responseData = await response.json();
@@ -63,7 +63,7 @@ async function getPicture() {
 
     try {
         // city picture
-        let url = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=${cityName}&order=popular`
+        let url = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=${cityName}&order=popular&lang=en&category=buildings`
         let response = await fetch(url);
         let responseData = await response.json();
 
@@ -72,7 +72,7 @@ async function getPicture() {
         else {
             // country picture
             const countryName = countries.getName(receivedData.countryCode, "en", {select: "official"});
-            url = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=${countryName}&order=popular&lang=en&category=places`;
+            url = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=${countryName}&order=popular&lang=en&category=buildings`;
             let response = await fetch(url);
             let responseData = await response.json();
 
@@ -80,7 +80,7 @@ async function getPicture() {
                 return responseData.hits[0].webformatURL;
             else {
                 // travel picture
-                url = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=travel&order=popular`;
+                url = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&q=travel&order=popular&lang=en&category=buildings`;
                 let response = await fetch(url);
                 let responseData = await response.json();
                 return responseData.hits[0].webformatURL;
