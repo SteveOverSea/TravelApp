@@ -62,6 +62,12 @@ The user provides a location name and a destination date for a desired trip. If 
 
 ### App Functionality
 
+#### Screenshots
+
+![Submit Form](https://i.ibb.co/TrRvPpV/Screenshot-2021-04-29-at-09-25-44.png)
+![Current Weather](https://i.ibb.co/4jS3D9J/Screenshot-2021-04-29-at-09-26-05.png)
+![Forecast Weather](https://i.ibb.co/98nmDK7/Screenshot-2021-04-29-at-09-26-30.png)
+
 #### Server-side
 
 The server is based on Node.js. It is split up between [app.js](https://github.com/SteveOverSea/TravelApp/tree/master/src/server/server.js)and [server.js](https://github.com/SteveOverSea/TravelApp/tree/master/src/server/server.js) to separate the listening server from the functionality of the API.
