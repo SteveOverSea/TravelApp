@@ -108,6 +108,8 @@ The scss styles could be more refactored and the test files could be more specif
 
 Also somehow the Input-Event detection and the datalist suggestion in locationSuggester.js doesn't work fully in Safari. It's interesting that the suggested options are only shown after adding a space or backspace on the input.
 
+The DOM Manipuliation could also be done more efficient with DOMFragments, but I kept it for now, as the delay is not that big of deal for the moment.
+
 ## Technology
 
 **Webpack**
