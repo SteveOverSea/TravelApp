@@ -20,7 +20,7 @@ Start the server (default port: 8080)
 npm run start
 ```
 
-Build the project
+Build the project - then a dist folder should appear in your root folder
 
 ```
 npm run build-prod
